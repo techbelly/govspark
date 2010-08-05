@@ -1,3 +1,6 @@
+google.load("visualization", "1", {packages:["imagesparkline"]});
+google.setOnLoadCallback(loadingBody);
+
 // start here on load
 function commaSep(value) {
     value = value.toString();
@@ -20,28 +23,30 @@ function loadingBody() {
     var row = document.createElement('tr');
 
     createTableHeader(row, 'Department');
+    createTableHeader(row, '');
     createTableHeader(row, 'Site Name');
     createTableHeader(row, 'Daily avg. (kWh)');
     createTableHeader(row, 'Average during working hours (kWh)');
     createTableHeader(row, 'Outside working hours average (kWh)');
     createTableHeader(row, 'Reduction (%)');
-    createTableHeader(row, '');
     thead.appendChild(row);
 
     var tbody = document.createElement('tbody');
     table.appendChild(tbody);
-
+    document.getElementById('mytable').innerHTML = '';
+    document.getElementById('mytable').appendChild(table);
+    
 	/////// load data
 
     displayData(load_json("json/home_office.json"), tbody, "Home Office");
     displayData(load_json("json/bis.json"), tbody, "BIS");
     displayData(load_json("json/mod.json"),tbody,"MOD");
+    displayData(load_json("json/dcms.json"),tbody,"DCMS");
     displayData(load_json("json/dwp.json"),tbody,"DWP");
     
 	/////// display table
 
-    document.getElementById('mytable').innerHTML = '';
-    document.getElementById('mytable').appendChild(table);
+
 }
 
 function load_json(name) {
@@ -62,6 +67,7 @@ function displayData(jsonDoc, tbody, deptName) {
     var howManyDays = jsonDoc.length;
 	var siteName = "";
 
+    var usage_by_day = [];
 	// loop through days (normal array)
     for (i = 0; i < howManyDays; i++) {
 
@@ -125,6 +131,7 @@ function displayData(jsonDoc, tbody, deptName) {
 		var otherMean = otherUsage / 14;
 		var reduction = 100 - ((otherUsage / workUsage) * 100);
 		
+		usage_by_day.push(dayUsage);
         //console.log(date);
         //console.log("day: " + dayUsage + ", mean: " + dayMean);
         //console.log("work: " + workUsage + ", mean: " + workMean);
@@ -140,40 +147,49 @@ function displayData(jsonDoc, tbody, deptName) {
 	// add single row to html table for ALL DAYS of this dataset
     var row = document.createElement('tr');
     createTableData(row, deptName);
+    var chart_id = 'chart-'+(deptName.replace(' ',''));
+	createTableData(row, chart_id,chart_id);
     createTableData(row, siteName);
     createTableData(row, commaSep(Math.round(all_dayMean)));
     createTableData(row, commaSep(Math.round(all_workMean)));
     createTableData(row, commaSep(Math.round(all_otherMean)));
     createTableData(row, Math.round(all_reduction));
 	// tried to create chart as table cell but came up as text not an image :/
-	//createTableData(row, '<img src="http://chart.apis.google.com/chart?cht=p&chd=s:Uf9a&chs=200x100&chd=t:' + all_reduction + ',100" alt="' + all_reduction + '% reduction"/>');
+	
+
     tbody.appendChild(row);
 
-	// ....sample google charts (http://code.google.com/apis/chart/)
-	// http://chart.apis.google.com/chart?chs=220x100&cht=bvg&chd=t:2999256,2490981|2921049,2046947&chds=130000,3000000&chco=cccccc,4D89F9,C6D9FD
-	// http://chart.apis.google.com/chart?cht=p&chd=s:Uf9a&chs=200x100&chd=t:27,100
-	
-    //console.log("-----------------");
-    //console.log("day: " + all_dayUsage + ", mean: " + all_dayMean);
-    //console.log("work: " + all_workUsage + ", mean: " + all_workMean);
-    //console.log("other: " + all_otherUsage + ", mean: " + all_otherMean);
+    var data = new google.visualization.DataTable();
+    data.addColumn("number", "kWh");
+    data.addRows(usage_by_day.length);
+    for(var j = 0; j < usage_by_day.length; j++) {
+        data.setValue(j,0,usage_by_day[j]);
+    }
+    
+    var chart = new google.visualization.ImageSparkLine(document.getElementById(chart_id));
+    chart.draw(data, {width: 120, height: 40, showAxisLines: false,  showValueLabels: false, labelPosition: 'none'});
 }
 
-/////////// helper functions
 
-function createTableRowContent(rowObject, data, cellType) {
+function createTableRowContent(rowObject, data, cellType,id) {
     var rowContent = document.createElement(cellType);
-    var cell = document.createTextNode(data);
+    var cell;
+    if (id) {
+        cell = document.createElement("div");
+        cell.id = id;
+    } else {
+        cell = document.createTextNode(data);
+    }
     rowContent.appendChild(cell);
     rowObject.appendChild(rowContent);
 }
 
-function createTableData(rowObject, data) {
-    createTableRowContent(rowObject, data, 'td');
+function createTableData(rowObject, data,id) {
+    createTableRowContent(rowObject, data, 'td',id);
 }
 
-function createTableHeader(rowObject, data) {
-    createTableRowContent(rowObject, data, 'th');
+function createTableHeader(rowObject, data,id) {
+    createTableRowContent(rowObject, data, 'th',id);
 }
 
 function include(arr, obj) {
