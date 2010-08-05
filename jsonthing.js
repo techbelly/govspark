@@ -1,4 +1,13 @@
 // start here on load
+function commaSep(value) {
+    value = value.toString();
+    var regexp = new RegExp('(-?[0-9]+)([0-9]{3})');
+    while(regexp.test(value)) {
+        value = value.replace(regexp, '$1,$2');
+    }
+    return value;
+}
+
 function loadingBody() {
 	/////// setup table
 	
@@ -12,12 +21,9 @@ function loadingBody() {
 
     createTableHeader(row, 'Department');
     createTableHeader(row, 'Site Name');
-    createTableHeader(row, 'Day total (kWh)');
-    createTableHeader(row, 'Day avg. (kWh)');
-    createTableHeader(row, 'Work day total (kWh)');
-    createTableHeader(row, 'Work day avg. (kWh)');
-    createTableHeader(row, 'Non-work day total (kWh)');
-    createTableHeader(row, 'Non-work day avg. (kWh)');
+    createTableHeader(row, 'Daily avg. (kWh)');
+    createTableHeader(row, 'Average during working hours (kWh)');
+    createTableHeader(row, 'Outside working hours average (kWh)');
     createTableHeader(row, 'Reduction (%)');
     createTableHeader(row, '');
     thead.appendChild(row);
@@ -135,12 +141,9 @@ function displayData(jsonDoc, tbody, deptName) {
     var row = document.createElement('tr');
     createTableData(row, deptName);
     createTableData(row, siteName);
-    createTableData(row, Math.round(all_dayUsage));
-    createTableData(row, Math.round(all_dayMean));
-    createTableData(row, Math.round(all_workUsage));
-    createTableData(row, Math.round(all_workMean));
-    createTableData(row, Math.round(all_otherUsage));
-    createTableData(row, Math.round(all_otherMean));
+    createTableData(row, commaSep(Math.round(all_dayMean)));
+    createTableData(row, commaSep(Math.round(all_workMean)));
+    createTableData(row, commaSep(Math.round(all_otherMean)));
     createTableData(row, Math.round(all_reduction));
 	// tried to create chart as table cell but came up as text not an image :/
 	//createTableData(row, '<img src="http://chart.apis.google.com/chart?cht=p&chd=s:Uf9a&chs=200x100&chd=t:' + all_reduction + ',100" alt="' + all_reduction + '% reduction"/>');
