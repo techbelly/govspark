@@ -178,7 +178,7 @@ function displayData(jsonDoc, tbody, deptName) {
             data2.setValue(0, 1, Math.round((all_otherUsage / all_dayUsage)*100));
 
             var chart2 = new google.visualization.Gauge(document.getElementById(chart_id+'2'));
-            var options2 = {width: 400, height: 120, redFrom: 50, redTo: 100,
+            var options2 = {width: 200, height: 100, redFrom: 50, redTo: 100,
                 yellowFrom:30, yellowTo: 50, minorTicks: 10};
             chart2.draw(data2, options2);
 }
