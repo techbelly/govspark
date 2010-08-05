@@ -1,4 +1,4 @@
-google.load("visualization", "1", {packages:["imagesparkline"]});
+google.load("visualization", "1", {packages:["imagesparkline","gauge"]});
 google.setOnLoadCallback(loadingBody);
 
 // start here on load
@@ -154,6 +154,7 @@ function displayData(jsonDoc, tbody, deptName) {
     createTableData(row, commaSep(Math.round(all_workMean)));
     createTableData(row, commaSep(Math.round(all_otherMean)));
     createTableData(row, Math.round(all_reduction));
+    createTableData(row, chart_id,chart_id+'2');
 	// tried to create chart as table cell but came up as text not an image :/
 	
 
@@ -168,6 +169,18 @@ function displayData(jsonDoc, tbody, deptName) {
     
     var chart = new google.visualization.ImageSparkLine(document.getElementById(chart_id));
     chart.draw(data, {width: 120, height: 40, showAxisLines: false,  showValueLabels: false, labelPosition: 'none'});
+    
+	var data2 = new google.visualization.DataTable();
+            data2.addColumn('string', 'Label');
+            data2.addColumn('number', 'Value');
+            data2.addRows(1);
+            data2.setValue(0, 0, 'Overnight');
+            data2.setValue(0, 1, Math.round((all_otherUsage / all_dayUsage)*100));
+
+            var chart2 = new google.visualization.Gauge(document.getElementById(chart_id+'2'));
+            var options2 = {width: 400, height: 120, redFrom: 50, redTo: 100,
+                yellowFrom:30, yellowTo: 50, minorTicks: 10};
+            chart2.draw(data2, options2);
 }
 
 

@@ -11,7 +11,7 @@ class NilClass
 end
 
 days = []
-open("http://www.stark.co.uk/government/DWP/Reports/DYTS01_kWh.csv") do |f|
+open("http://www.carbonculture.net/orgs/dcms/2-4-cockspur-street/reports/elec00.csv") do |f|
   found_headings = false
   while (line=f.gets)
     fields = CSV.parse_line(line).map{|m| m.strip }
