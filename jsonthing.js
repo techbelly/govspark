@@ -42,8 +42,8 @@ function load_json(name) {
     var req = new XMLHttpRequest();  
     req.open('GET', name, false);   
     req.send(null);  
-    if(req.status == 0)  
-      return (eval('(' + req.responseText + ')'));
+    if (req.status != 404)
+        return (eval('(' + req.responseText + ')'));
 }
 
 // fill a row with averages of a single dataset
