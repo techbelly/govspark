@@ -23,12 +23,13 @@ function loadingBody() {
     var row = document.createElement('tr');
 
     createTableHeader(row, 'Department');
-    createTableHeader(row, '');
+    createTableHeader(row, 'Weekly Usage');
     createTableHeader(row, 'Site Name');
     createTableHeader(row, 'Daily avg. (kWh)');
     createTableHeader(row, 'Average during working hours (kWh)');
-    createTableHeader(row, 'Outside working hours average (kWh)');
-    createTableHeader(row, 'Reduction (%)');
+    createTableHeader(row, 'Average outside working hours (kWh)');
+    createTableHeader(row, 'Day/Night Reduction (%)');
+//    createTableHeader(row, 'Overnight' );
     thead.appendChild(row);
 
     var tbody = document.createElement('tbody');
@@ -38,15 +39,27 @@ function loadingBody() {
     
 	/////// load data
 
-    displayData(load_json("json/home_office.json"), tbody, "Home Office");
-    displayData(load_json("json/bis.json"), tbody, "BIS");
-    displayData(load_json("json/mod.json"),tbody,"MOD");
-    displayData(load_json("json/dcms.json"),tbody,"DCMS");
-    displayData(load_json("json/dwp.json"),tbody,"DWP");
-    
+//	displayData(load_json("json/bis.json"),tbody,"Business, Innovaton and Skills");
+        displayData(load_json("json/co.json"),tbody,"Cabinet Office");
+        displayData(load_json("json/dcms.json"),tbody,"Culture, Media and Sport");
+        displayData(load_json("json/decc.json"),tbody,"Energy and Climate Change");
+	displayData(load_json("json/defra.json"),tbody,"Environment, Food and Rural Affairs");
+	displayData(load_json("json/fco.json"),tbody,"Foreign and Commonwealth Office");
+	displayData(load_json("json/hmrc.json"),tbody,"HM Revenue and Customs");
+	displayData(load_json("json/treasury.json"),tbody,"HM Treasury");
+        displayData(load_json("json/ho.json"),tbody,"Home Office");
+        displayData(load_json("json/mod.json"),tbody,"Ministry of Defence");
+	displayData(load_json("json/dft.json"),tbody,"Transport");
+        displayData(load_json("json/dwp.json"),tbody,"Work and Pensions");	
+	
 	/////// display table
 
-
+	jQuery('#mytable > table > tbody > tr').each(function (i, e) { $('td:eq(0)', e).addClass('dept') });
+	jQuery('#mytable > table > tbody > tr').each(function (i, e) { $('td:eq(3)', e).addClass('address') });
+	jQuery('#mytable > table > tbody > tr').each(function (i, e) { $('td:eq(4)', e).addClass('number') });
+	jQuery('#mytable > table > tbody > tr').each(function (i, e) { $('td:eq(5)', e).addClass('number') });
+	jQuery('#mytable > table > tbody > tr').each(function (i, e) { $('td:eq(6)', e).addClass('number') });
+	jQuery('#mytable > table > tbody > tr').each(function (i, e) { $('td:eq(7)', e).addClass('number') });
 }
 
 function load_json(name) {
@@ -95,7 +108,7 @@ function displayData(jsonDoc, tbody, deptName) {
 				siteName = value;
 
 			// if weird columns we dont care about, ignore!
-			} else if (include(["Utility", "kWh"], key)) {
+			} else if (include(["Utility", "kWh", "Total", "Total Imported"], key)) {
 
 				// I CARE NOT!
 				
@@ -177,10 +190,10 @@ function displayData(jsonDoc, tbody, deptName) {
             data2.setValue(0, 0, 'Overnight');
             data2.setValue(0, 1, Math.round((all_otherUsage / all_dayUsage)*100));
 
-            var chart2 = new google.visualization.Gauge(document.getElementById(chart_id+'2'));
-            var options2 = {width: 200, height: 100, redFrom: 50, redTo: 100,
-                yellowFrom:30, yellowTo: 50, minorTicks: 10};
-            chart2.draw(data2, options2);
+  //          var chart2 = new google.visualization.Gauge(document.getElementById(chart_id+'2'));
+    //        var options2 = {width: 200, height: 100, redFrom: 50, redTo: 100,
+      //          yellowFrom:30, yellowTo: 50, minorTicks: 10};
+        //    chart2.draw(data2, options2);
 }
 
 
