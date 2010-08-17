@@ -11,8 +11,15 @@ function commaSep(value) {
     return value;
 }
 
+Array.prototype.sum = function() {
+    var s = 0.0;
+    for (var i = 0; i < this.length; i++) {
+      s += (typeof this[i] == 'number') ? this[i] : parseFloat(this[i]);
+    }
+    return s;
+};
+
 function loadingBody() {
-	/////// setup table
 	
     var table = document.createElement('table');
     table.border = "1";
@@ -29,7 +36,6 @@ function loadingBody() {
     createTableHeader(row, 'Average during working hours (kWh)');
     createTableHeader(row, 'Average outside working hours (kWh)');
     createTableHeader(row, 'Day/Night Reduction (%)');
-//    createTableHeader(row, 'Overnight' );
     thead.appendChild(row);
 
     var tbody = document.createElement('tbody');
@@ -37,22 +43,20 @@ function loadingBody() {
     document.getElementById('mytable').innerHTML = '';
     document.getElementById('mytable').appendChild(table);
     
-	/////// load data
 
-//	displayData(load_json("json/bis.json"),tbody,"Business, Innovaton and Skills");
-        displayData(load_json("json/co.json"),tbody,"Cabinet Office");
-        displayData(load_json("json/dcms.json"),tbody,"Culture, Media and Sport");
-        displayData(load_json("json/decc.json"),tbody,"Energy and Climate Change");
+	displayData(load_json("json/bis.json"),tbody,"Business, Innovaton and Skills");
+    displayData(load_json("json/co.json"),tbody,"Cabinet Office");
+    displayData(load_json("json/dcms.json"),tbody,"Culture, Media and Sport");
+    displayData(load_json("json/decc.json"),tbody,"Energy and Climate Change");
 	displayData(load_json("json/defra.json"),tbody,"Environment, Food and Rural Affairs");
 	displayData(load_json("json/fco.json"),tbody,"Foreign and Commonwealth Office");
 	displayData(load_json("json/hmrc.json"),tbody,"HM Revenue and Customs");
 	displayData(load_json("json/treasury.json"),tbody,"HM Treasury");
-        displayData(load_json("json/ho.json"),tbody,"Home Office");
-        displayData(load_json("json/mod.json"),tbody,"Ministry of Defence");
+    displayData(load_json("json/ho.json"),tbody,"Home Office");
+    displayData(load_json("json/mod.json"),tbody,"Ministry of Defence");
 	displayData(load_json("json/dft.json"),tbody,"Transport");
-        displayData(load_json("json/dwp.json"),tbody,"Work and Pensions");	
+    displayData(load_json("json/dwp.json"),tbody,"Work and Pensions");	
 	
-	/////// display table
 
 	jQuery('#mytable > table > tbody > tr').each(function (i, e) { $('td:eq(0)', e).addClass('dept') });
 	jQuery('#mytable > table > tbody > tr').each(function (i, e) { $('td:eq(3)', e).addClass('address') });
@@ -70,92 +74,35 @@ function load_json(name) {
         return (eval('(' + req.responseText + ')'));
 }
 
-// fill a row with averages of a single dataset
 function displayData(jsonDoc, tbody, deptName) {
-
-    var all_dayUsage = 0;
-    var all_workUsage = 0;
-    var all_otherUsage = 0;
 
     var howManyDays = jsonDoc.length;
 	var siteName = "";
 
-    var usage_by_day = [];
-	// loop through days (normal array)
-    for (i = 0; i < howManyDays; i++) {
+    var dailyUsage = [];
+    var dailyUsageWh = [];
+    var dailyUsageNwh = [];
+    
+    for (var i = 0; i < howManyDays; i++) {
 
-		// define a couple of things so they can be used outside the inner loop
-        var dayUsage = 0;
-        var workUsage = 0;
-        var otherUsage = 0;
-		var date = "";
-
-		// loop through time segments in the day (associative array AKA hash)
-        for (var k in jsonDoc[i]) { // k is key in associative array - either "Date" or time slot, eg "14:30"
-
-			// just to make it clearer, some things below depend on the key, others on the value!
-			var key = k;
-			var value = jsonDoc[i][k];
-
-			// assign date
-			if (key == "Date") {
-				date = value;
-
-			// we might care about site name, so save
-			} else if (key == "Site Name") {
-
-				// this actually keeps setting, could improve to only set once....
-				siteName = value;
-
-			// if weird columns we dont care about, ignore!
-			} else if (include(["Utility", "kWh", "Total", "Total Imported"], key)) {
-
-				// I CARE NOT!
-				
-			// add usage for time slot to pile, for averaging after!
-			} else {
-				// assign usage number so we dont have to keep typing the following
-				var usage = parseInt(value);
-								
-				// some NaN's happening (not a number), if invalid skip to next in loop here
-				if (!usage)
-					continue;
-
-				// add the usage to the current day's & all days total usage!
-		        dayUsage += usage;
-		        all_dayUsage += usage;
-				
-				// if a working day time segment, add to work usage
-				if (include(["08:00", "08:30", "09:00", "09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30"], key)) {
-			        workUsage += usage;
-					all_workUsage += usage;
-			
-				// if not in work time, add to other usage
-				} else {
-					otherUsage += usage;
-					all_otherUsage += usage;
-				}
-			}
-        }
-
-		// get mean by dividing total usage by hours
-		var dayMean = dayUsage / 24;
-		var workMean = workUsage / 10;
-		var otherMean = otherUsage / 14;
-		var reduction = 100 - ((otherUsage / workUsage) * 100);
-		
-		usage_by_day.push(dayUsage);
-        //console.log(date);
-        //console.log("day: " + dayUsage + ", mean: " + dayMean);
-        //console.log("work: " + workUsage + ", mean: " + workMean);
-        //console.log("other: " + otherUsage + ", mean: " + otherMean);
-        //console.log("...");
+        var date = jsonDoc[i]["Date"];
+        siteName = jsonDoc[i]["Site Name"];
+        
+        var readings =  jsonDoc[i]['readings'];
+        console.log(readings);
+        var workingHours = readings.slice(16,28);
+        var nonWorkingHours = readings.slice(0,16).concat(readings.slice(28)); 
+        
+		dailyUsage.push(readings.sum());
+        dailyUsageWh.push(workingHours.sum());
+        dailyUsageNwh.push(nonWorkingHours.sum());        
     }
 
-	var all_dayMean = all_dayUsage / 24;
-	var all_workMean = all_workUsage / 10;
-	var all_otherMean = all_otherUsage / 14;
-	var all_reduction = 100 - ((all_otherUsage / all_workUsage) * 100);
+	var all_dayMean = dailyUsage.sum() / 24;
+	var all_workMean = dailyUsageWh.sum() / 10;
+	var all_otherMean = dailyUsageNwh.sum() / 14;
+	
+	var all_reduction = 100 - ((dailyUsageNwh.sum() / dailyUsageWh.sum()) * 100);
 
 	// add single row to html table for ALL DAYS of this dataset
     var row = document.createElement('tr');
@@ -167,33 +114,31 @@ function displayData(jsonDoc, tbody, deptName) {
     createTableData(row, commaSep(Math.round(all_workMean)));
     createTableData(row, commaSep(Math.round(all_otherMean)));
     createTableData(row, Math.round(all_reduction));
-    createTableData(row, chart_id,chart_id+'2');
-	// tried to create chart as table cell but came up as text not an image :/
-	
+    createTableData(row, chart_id,chart_id+'2');	
 
     tbody.appendChild(row);
 
     var data = new google.visualization.DataTable();
     data.addColumn("number", "kWh");
-    data.addRows(usage_by_day.length);
-    for(var j = 0; j < usage_by_day.length; j++) {
-        data.setValue(j,0,usage_by_day[j]);
+    data.addRows(dailyUsage.length);
+    for(var j = 0; j < dailyUsage.length; j++) {
+        data.setValue(j,0,dailyUsage[j]);
     }
     
     var chart = new google.visualization.ImageSparkLine(document.getElementById(chart_id));
     chart.draw(data, {width: 120, height: 40, showAxisLines: false,  showValueLabels: false, labelPosition: 'none'});
     
-	var data2 = new google.visualization.DataTable();
-            data2.addColumn('string', 'Label');
-            data2.addColumn('number', 'Value');
-            data2.addRows(1);
-            data2.setValue(0, 0, 'Overnight');
-            data2.setValue(0, 1, Math.round((all_otherUsage / all_dayUsage)*100));
-
-  //          var chart2 = new google.visualization.Gauge(document.getElementById(chart_id+'2'));
-    //        var options2 = {width: 200, height: 100, redFrom: 50, redTo: 100,
-      //          yellowFrom:30, yellowTo: 50, minorTicks: 10};
-        //    chart2.draw(data2, options2);
+   // var data2 = new google.visualization.DataTable();
+   // data2.addColumn('string', 'Label');
+   // data2.addColumn('number', 'Value');
+   // data2.addRows(1);
+   // data2.setValue(0, 0, 'Overnight');
+   // data2.setValue(0, 1, Math.round((all_otherUsage / all_dayUsage)*100));
+   // 
+   // var chart2 = new google.visualization.Gauge(document.getElementById(chart_id+'2'));
+   // var options2 = {width: 200, height: 100, redFrom: 50, redTo: 100,
+   //               yellowFrom:30, yellowTo: 50, minorTicks: 10};
+   // chart2.draw(data2, options2);
 }
 
 
