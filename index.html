@@ -3,8 +3,13 @@
 <link href="style.css" rel="stylesheet" type="text/css" />
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <script type="text/javascript" src="http://www.google.com/jsapi"></script>
-<script  src="govspark_api.js" language="javascript"></script>
-<script  src="table.js" language="javascript"></script>
+
+<script type="text/javascript" src="http://highcharts.com/js/highcharts.js"></script>
+<script type="text/javascript" src="http://highcharts.com/js/modules/exporting.src.js"></script>
+
+<script src="govspark_api.js" language="javascript"></script>
+<script src="table.js" language="javascript"></script>
+<script src="graph.js" language="javascript"></script>
 <title>GovSpark | Government Department Energy Consumption Comparisons</title>
 </head>
 <body>
@@ -27,6 +32,18 @@
 <tr><th>Average energy consumption</th></tr>
 <tr><th>410.32</th>
 </table>-->
+
+<form name="dynamic_form" style="clear:both;margin:0 auto;width:560px;">
+	<input type="checkbox" name="Department" value="HomeOffice" onchange="updateChart()" /> Home Office <input type="checkbox" name="Department" value="BIS" onchange="updateChart()" /> BIS <input type="checkbox" name="Department" value="MOD" onchange="updateChart()" /> MOD <input type="checkbox" name="Department" value="Department for Culture, Media and Sport" onchange="updateChart()" checked="true"/> DCMS <input type="checkbox" name="Department" value="DWP" onchange="updateChart()" /> DWP <input type="checkbox" name="Department" value="Department of Energy and Climate Change" onchange="updateChart()" checked="true" /> DECC <input type="checkbox" name="Department" value="Cabinet Office" onchange="updateChart()" checked="true" /> Cabinet Office <input type="checkbox" name="Department" value="Department for Environment, Food and Rural Affairs" onchange="updateChart()" /> DEFRA <input type="checkbox" name="Department" value="DFT" onchange="updateChart()" /> DFT <input type="checkbox" name="Department" value="DFID" onchange="updateChart()" /> DFID <input type="checkbox" name="Department" value="Foreign and Commonwealth Office" onchange="updateChart()" /> FCO <input type="checkbox" name="Department" value="HM Revenue and Customs" onchange="updateChart()" /> HMRC <input type="checkbox" name="Department" value="HM Treasury" onchange="updateChart()" /> Treasury <br />
+
+	<input type="checkbox" name="Day" value="Sunday" onchange="updateChart()" /> Sunday <input type="checkbox" name="Day" name="Monday" onchange="updateChart()" checked="true" /> Monday <input type="checkbox" name="Day" value="Tuesday" onchange="updateChart()" /> Tuesday <input type="checkbox" name="Day" value="Wednesday" onchange="updateChart()" /> Wednesday <input type="checkbox" name="Day" value="Thursday" onchange="updateChart()" /> Thursday <input type="checkbox" name="Day" value="Friday" onchange="updateChart()" /> Friday <input type="checkbox" name="Day" value="Saturday" onchange="updateChart()" /> Saturday
+</form> 
+
+<div id="dynamic" class="highcharts-container" style="height:410px; width: 800px; margin: 0 auto; clear:both">
+
+</div>
+
+
 
 <div class="footer">
 <p>Created by <a href="http://issyl0.co.uk/">Isabell Long</a> as part of <a href="http://rewiredstate.org/yrs">Young Rewired State</a> London 2010.</p>

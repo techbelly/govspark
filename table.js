@@ -58,6 +58,10 @@ function tableRow(parent) {
     };
 }
 
+//cache for data once its loaded
+//cache for data once its loaded
+var cachedDepartmentData = new Array();
+
 function createTable() {
     
     var table = document.createElement('table');
@@ -75,6 +79,8 @@ function createTable() {
     for(var j = 0; j < depts.length; j++) {
         request_data(depts[j], function(jsonDoc) {
             populateRow(tableRow(tbody),data_for(jsonDoc));
+            cachedDepartmentData[jsonDoc[0].name] = jsonDoc;
+            updateChart();
         });
     }
 }
