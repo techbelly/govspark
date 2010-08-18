@@ -38,10 +38,6 @@ function data_for(jsonDoc) {
         var workingHours = readings.slice(18,38);
         var nonWorkingHours = readings.remove(18,37); 
         
-        console.log(readings);
-        console.log(workingHours.length);
-        console.log(nonWorkingHours.length);
-        
 		dailyUsage.push(readings.sum());
         dailyUsageWh.push(workingHours.sum());
         dailyUsageNwh.push(nonWorkingHours.sum());        
