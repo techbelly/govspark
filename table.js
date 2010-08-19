@@ -92,7 +92,8 @@ function createTable() {
     table.appendChild(tbody);
     
     var row = tableRow(thead,0);
-    row.headers(['Department','Weekly Usage','Site Name','']);
+//    row.headers(['Department','Weekly Usage','Site Name','']);
+    row.headers(['Department','Daily Usage']);
         
     var depts = ["hmt","co","dcms","decc","defra","fco","hmrc","dfe", "moj", "mod", "dft", "ho", "dfid", "bis", "dwp", "dfe"];
     for(var j = 0; j < depts.length; j++) {
@@ -117,12 +118,14 @@ function populateRow(tbody,usage) {
                '% less energy overnight than it does during the day.';
     
     var name = usage['name'];
-    var chart_id = 'chart-'+name.replace(' ','');
+//    var chart_id = 'chart-'+name.replace(' ','');
 
     var rowIndex = getRowIndex(usage['pctLessOvernight'].commaSeparated());
     var row = tableRow(tbody, rowIndex);
-    row.cells([name,[chart_id,chart_id],name,text],['dept','','address']);
-    sparkline(usage['dailyUsage'],chart_id)
+    row.cells([name,text],['dept','','address']);
+
+//    row.cells([name,[chart_id,chart_id],name,text],['dept','','address']);
+//    sparkline(usage['dailyUsage'],chart_id)
 }
 
 function sparkline(usage,dest_id) {
