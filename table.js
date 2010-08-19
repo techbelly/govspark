@@ -75,9 +75,13 @@ function createTable() {
     var row = tableRow(thead);
     row.headers(['Department','Weekly Usage','Site Name','']);
         
-    var depts = ["hmt","co","dcms","decc","defra","fco","hmrc"];
+    var depts = ["hmt","co","dcms","decc","defra","fco","hmrc","dfe", "moj", "mod", "dft", "ho", "dfid", "bis", "dwp", "dfe"];
     for(var j = 0; j < depts.length; j++) {
         request_data(depts[j], function(jsonDoc) {
+            //if response empty return
+            if (jsonDoc.length != 7) {
+		return;               
+            }
             populateRow(tableRow(tbody),data_for(jsonDoc));
             cachedDepartmentData[jsonDoc[0].name] = jsonDoc;
             updateChart();
