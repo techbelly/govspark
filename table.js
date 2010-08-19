@@ -10,9 +10,17 @@ Number.prototype.commaSeparated = function() {
     return value;
 }
 
-function tableRow(parent) {
-    var row = document.createElement('tr');
-    parent.appendChild(row);
+function tableRow(parent, index) {
+//    var row = document.createElement('tr');
+//    parent.appendChild(row);
+    var row;
+    if (parent.rows.length <= index) {
+	row = document.createElement('tr');
+        parent.appendChild(row);
+    } else {
+        row = parent.insertRow(index);
+    }
+
     return {
         rowElement: row,
         
@@ -61,6 +69,17 @@ function tableRow(parent) {
 //cache for data once its loaded
 //cache for data once its loaded
 //var cachedDepartmentData = new Array();
+var cachedDepartment = new Array();
+function getRowIndex(pctLessOvernight) {	
+	for (var d=0;d<cachedDepartment.length;d++) {
+		if (pctLessOvernight < cachedDepartment[d]) {
+			cachedDepartment.splice(d,0,pctLessOvernight);
+			return d;
+		}
+	}
+	cachedDepartment.push(pctLessOvernight);
+	return cachedDepartment.length;
+}
 
 function createTable() {
     
@@ -72,7 +91,7 @@ function createTable() {
     table.appendChild(thead);
     table.appendChild(tbody);
     
-    var row = tableRow(thead);
+    var row = tableRow(thead,0);
     row.headers(['Department','Weekly Usage','Site Name','']);
         
     var depts = ["hmt","co","dcms","decc","defra","fco","hmrc","dfe", "moj", "mod", "dft", "ho", "dfid", "bis", "dwp", "dfe"];
@@ -82,14 +101,14 @@ function createTable() {
             if (jsonDoc.length != 7) {
 		return;               
             }
-            populateRow(tableRow(tbody),data_for(jsonDoc));
+            populateRow(tbody,data_for(jsonDoc));
 //            cachedDepartmentData[jsonDoc[0].name] = jsonDoc;
 //            updateChart();
         });
     }
 }
 
-function populateRow(row,usage) {
+function populateRow(tbody,usage) {
 
     var text = 'This department\'s HQ uses an average of  '+
                 usage['averageUsage'].commaSeparated() +
@@ -100,6 +119,8 @@ function populateRow(row,usage) {
     var name = usage['name'];
     var chart_id = 'chart-'+name.replace(' ','');
 
+    var rowIndex = getRowIndex(usage['pctLessOvernight'].commaSeparated());
+    var row = tableRow(tbody, rowIndex);
     row.cells([name,[chart_id,chart_id],name,text],['dept','','address']);
     sparkline(usage['dailyUsage'],chart_id)
 }
