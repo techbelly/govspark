@@ -1,0 +1,100 @@
+<html>
+<head>
+<link href="style.css" rel="stylesheet" type="text/css" />
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+
+<script type="text/javascript" src="http://highcharts.com/js/highcharts.js"></script>
+<script type="text/javascript" src="http://highcharts.com/js/modules/exporting.src.js"></script>
+
+<script src="govspark_api.js" language="javascript"></script>
+<script src="graph.js" language="javascript"></script>
+
+<script language="javascript">
+   //cache for data once its loaded
+   var cachedDepartmentData = new Array();
+   var depts = ["hmt","co","dcms","decc","defra","fco","hmrc","dfe", "moj", "mod", "dft", "ho", "dfid", "bis", "dwp", "dfe"];
+    for(var j = 0; j < depts.length; j++) {
+        request_data(depts[j], function(jsonDoc) {
+            //if response empty return
+            if (jsonDoc.length != 7) {
+		return;               
+            }
+//            populateRow(tableRow(tbody),data_for(jsonDoc));
+            cachedDepartmentData[jsonDoc[0].name] = jsonDoc;
+            updateChart();
+        });
+    }
+</script>
+<title>GovSpark | Government Department Energy Analysis</title>
+<style>
+.goss .net {
+	text-align: right;
+}
+</style>
+</head>
+<body>
+
+<img src="transparentlogo.png"></img>
+
+<p class="sentence">Government Department Energy Consumption</p>
+
+<div id="myjson"></div>
+
+<form name="dynamic_form" style="clear:both;margin:0 auto;width:700px;">
+	<label for="homeoffice"><input type="checkbox" id="homeoffice" name="Department" value="Home Office" onchange="updateChart()" /> Home Office</label>
+	<label for="bis"><input type="checkbox" id="bis" name="Department" value="Department for Business Information & Skill" onchange="updateChart()" /> BIS</label>
+	<label for="mod"><input type="checkbox" id="mod" name="Department" value="Ministry of Defence" onchange="updateChart()" /> MOD</label>
+	<label for="dcms"><input type="checkbox" id="dcms" name="Department" value="Department for Culture, Media and Sport" onchange="updateChart()" checked="true"/> DCMS</label>
+	<label for="dwp"><input type="checkbox" id="dwp" name="Department" value="Department for Work and Pensions" onchange="updateChart()" /> DWP</label>
+	<label for="decc"><input type="checkbox" id="decc" name="Department" value="Department of Energy and Climate Change" onchange="updateChart()" checked="true" /> DECC</label>
+	<label for="co"><input type="checkbox" id="co" name="Department" value="Cabinet Office" onchange="updateChart()" checked="true" /> Cabinet Office</label><br />
+	<label for="defra"><input type="checkbox" id="defra" name="Department" value="Department for Environment, Food and Rural Affairs" onchange="updateChart()" /> DEFRA</label>
+	<label for="dft"><input type="checkbox" id="dft" name="Department" value="Department for Transport" onchange="updateChart()" /> DFT</label>
+	<label for="dfid"><input type="checkbox" id="dfid" name="Department" value="Department for International Development" onchange="updateChart()" /> DFID</label>
+	<label for="fco"><input type="checkbox" id="fco" name="Department" value="Foreign and Commonwealth Office" onchange="updateChart()" /> FCO</label>
+	<label for="hmrc"><input type="checkbox" id="hmrc" name="Department" value="HM Revenue and Customs" onchange="updateChart()" /> HMRC</label>
+	<label for="hmt"><input type="checkbox" id="hmt" name="Department" value="HM Treasury" onchange="updateChart()" /> Treasury</label>
+	<label for="moj"><input type="checkbox" id="moj" name="Department" value="Ministry of Justice" onchange="updateChart()" /> MoJ</label>
+	<label for="dfe"><input type="checkbox" id="dfe" name="Department" value="Department for Education" onchange="updateChart()" /> DFE</label><br />
+
+	<input type="checkbox" name="Day" value="Sunday" onchange="updateChart()" /> Sunday <input type="checkbox" name="Day" name="Monday" onchange="updateChart()" checked="true" /> Monday <input type="checkbox" name="Day" value="Tuesday" onchange="updateChart()" /> Tuesday <input type="checkbox" name="Day" value="Wednesday" onchange="updateChart()" /> Wednesday <input type="checkbox" name="Day" value="Thursday" onchange="updateChart()" /> Thursday <input type="checkbox" name="Day" value="Friday" onchange="updateChart()" /> Friday <input type="checkbox" name="Day" value="Saturday" onchange="updateChart()" /> Saturday <br />
+
+	Divide electricy used by <input type="radio" name="FloorSpace" value="none" onchange="removeLines();updateChart();" checked="true"> nothing  <input type="radio" name="FloorSpace" value="net" onchange="removeLines();updateChart();"> net floor space <input type="radio" name="FloorSpace" value="gross" onchange="removeLines();updateChart();"> gross floor space
+</form> 
+
+<div id="dynamic" class="highcharts-container" style="height:500px; width: 910px; margin: 0 auto; clear:both">
+
+</div>
+
+
+<div id="mytable">
+<table style="width: 910px; margin: 0 auto; clear:both"><thead><tr><th>Department</th><th>Net Floor Area (m&#178;)</th><th>Gross Floor Area (m&#178;)</th></tr></thead>
+<tbody>
+<tr><td class="address">BIS 1 Victoria Street, London SW1H 0ET</td><td class="net">28,133</td><td class="gross">46,314</td></tr>
+<tr><td class="address">CLG Eland House, Bressenden Place, London SW1E 5DU</td><td>21,130</td><td>37,962</td></tr>
+<tr><td class="address">CO 70 Whitehall, 70 Whitehall London SW1A 2AS</td><td>5,153</td><td>14,480</td></tr>
+<tr><td class="address">DCMS 2-4 Cockspur Street London SW1Y 5DH</td><td>8,049</td><td>12,641</td><td></tr> 
+<tr><td class="address">DECC 3 Whitehall Place, London SW1A 2AW</td><td>8,768</td><td>10,960</td></tr>
+<tr><td class="address">Defra Nobel House, 17 Smith Square, London SW1P 3JR</td><td>13,513</td><td>16,891</td></tr>
+<tr><td class="address">DfE Sanctuary Buildings Sanctuary Buildings, Great Smith Street, London SW1P 3BT</td><td>19,691</td><td>26,128</td></tr>
+<tr><td class="address">DfID 1 Palace Street, London, SW1E 5HE</td><td>16,405</td><td>24,240</td></tr>
+<tr><td class="address">DfT Great Minster House, 76 Marsham Street. London SW1P 4DR</td><td>21,765</td><td>27,449</td></tr>
+<tr><td class="address">DH Richmond House, 79 Whitehall, London SW1A 2NS</td><td>13,251</td><td>14,956</td></tr>
+<tr><td class="address">DWP Caxton House, Tothill Street, London, SW1H 9DA</td><td>19,616</td><td>24,520</td></tr>
+<tr><td class="address">FCO King Charles Street, London SW1A 2AH</td><td>39,103</td><td>67,274</td></tr>
+<tr><td class="address">HMRC 100 Parliament Street, London, SW1A 2BQ</td><td>34,000</td><td>48,965</td></tr>
+<tr><td class="address">HMT 1 Horse Guards Road, London SW1A 2HQ</td><td>19,322</td><td>41,106</td></tr>
+<tr><td class="address">HO 2 Marsham Street, London, SW1P 4DF</td><td>42,844</td><td>69,095</td></tr>
+<tr><td class="address">MoD Main Building, Whitehall London SW1A 2HB</td><td>61,812</td><td>92,900</td></tr>
+<tr><td class="address">MoJ 102 Petty France, 102 Petty France London SW1H 9AJ</td><td>32,144</td><td>41,012</td></tr>
+<tr><td class="address">No10 10, 11, 12 Downing Street, London, SW1A, 2AA</td><td>4,058</td><td>6,745</td></tr>
+</tbody>
+</table></div>
+
+
+<div class="footer">
+<p>Created by <a href="http://issyl0.co.uk/">Isabell Long</a> as part of <a href="http://rewiredstate.org/yrs">Young Rewired State</a> London 2010.</p>
+</div>
+</body>
+</html>
