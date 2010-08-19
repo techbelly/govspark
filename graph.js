@@ -156,10 +156,10 @@ function updateChart() {
 					text: 'Electricity use',
 					x: -20 //center
 				},
-				subtitle: {
-					text: '',
-					x: -20
-				},
+//				subtitle: {
+//					text: '',
+//					x: -20
+//				},
 				xAxis: {
 					categories: times,
 					labels: {
