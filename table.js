@@ -60,7 +60,7 @@ function tableRow(parent) {
 
 //cache for data once its loaded
 //cache for data once its loaded
-var cachedDepartmentData = new Array();
+//var cachedDepartmentData = new Array();
 
 function createTable() {
     
@@ -83,8 +83,8 @@ function createTable() {
 		return;               
             }
             populateRow(tableRow(tbody),data_for(jsonDoc));
-            cachedDepartmentData[jsonDoc[0].name] = jsonDoc;
-            updateChart();
+//            cachedDepartmentData[jsonDoc[0].name] = jsonDoc;
+//            updateChart();
         });
     }
 }
